@@ -1,6 +1,6 @@
 // @TODO: YOUR CODE HERE!
-var svgWidth = 960;
-var svgHeight = 500;
+var svgWidth = 1000;
+var svgHeight = 750;
 
 var margin = {
   top: 20,
@@ -12,7 +12,7 @@ var margin = {
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 
-var svg = d3.select(".scatter")
+var svg = d3.select("#scatter")
   .append("svg")
   .attr("width", svgWidth)
   .attr("height", svgHeight);
@@ -20,26 +20,42 @@ var svg = d3.select(".scatter")
 var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-d3.csv("../data/data.csv")
+d3.csv("./assets/data/data.csv")
     .then(function(stateData) {
+        console.log(stateData);
+        console.log(stateData.obesity);
 
         stateData.forEach(function(data) {
-            data.poverty = +data.poverty;
-            data.povertyMoe = +data.povertyMoe;
-            data.age = +data.age;
-            data.ageMoe = +data.ageMoe;
-            data.income = +data.income;
-            data.incomeMoe = +data.incomeMoe;
-            data.healthcare = +data.healthcare;
-            data.healthcareLow = +data.healthcareLow;
-            data.healthcareHigh = +data.healthcareHigh;
-            data.obesity = +data.obesity;
-            data.obesityLow = +data.obesityLow;
-            data.obesityHigh = +data.obesityHigh;
-            data.smokes = +data.smokes;
-            data.smokesLow = +data.smokesLow;
-            data.smokesHigh = +data.smokesHigh;
+            stateData.poverty = +data.poverty;
+            stateData.povertyMoe = +data.povertyMoe;
+            stateData.age = +data.age;
+            stateData.ageMoe = +data.ageMoe;
+            stateData.income = +data.income;
+            stateData.incomeMoe = +data.incomeMoe;
+            stateData.healthcare = +data.healthcare;
+            stateData.healthcareLow = +data.healthcareLow;
+            stateData.healthcareHigh = +data.healthcareHigh;
+            stateData.obesity = +data.obesity;
+            stateData.obesityLow = +data.obesityLow;
+            stateData.obesityHigh = +data.obesityHigh;
+            stateData.smokes = +data.smokes;
+            stateData.smokesLow = +data.smokesLow;
+            stateData.smokesHigh = +data.smokesHigh;
+            stateData.abbr = data.abbr;
         });
+
+        // var xData = [];
+        // var yData = [];
+
+        // stateData.forEach(function(data) {
+        //     console.log(`smokes: ${data.smokes}`);
+        //     console.log(`income: ${data.income}`)
+        //     yData.push(data.smokes);
+        //     xData.push(data.inocme);
+        // });
+
+        // console.log(`xData: ${xData}`);
+        // console.log(`yData: ${yData}`);
 
         var xScale = d3.scaleLinear()
             .domain([20,d3.max(stateData, d => d.income)])
@@ -49,11 +65,14 @@ d3.csv("../data/data.csv")
             .domain([0, d3.max(stateData, d => d.obesity)])
             .range([height, 0]);
 
+        // console.log(d3.max(yData));
+        // console.log(d3.max(xdata));
+
         var bottomAxis = d3.axisBottom(xScale);
         var leftAxis = d3.axisLeft(yScale);
 
         chartGroup.append("g")
-            attr("transform", `translate(0, ${height})`)
+            .attr("transform", `translate(0, ${height})`)
             .call(bottomAxis);
 
         chartGroup.append("g")
@@ -61,14 +80,26 @@ d3.csv("../data/data.csv")
 
         var circlesGroup = chartGroup.selectAll("circle")
             .data(stateData)
-            .enter()
-            .append("circle")
+            .enter();
+
+        circlesGroup.append("circle")
             .attr("cx", d => xScale(d.income))
             .attr("cy", d => yScale(d.obesity))
-            .attr("r", "15")
-            .attr("fill", "saddlebrown")
-            .attr("opacity", "1")
-            .text(`${d.abbr}`);
+            .attr("r", "20")
+            .attr("fill", "cadetblue")
+            .attr("opacity", ".75");
+
+        circlesGroup.append("text")
+        .text(function(d) {
+            return d.abbr;
+        })
+        .attr("dx", function(d) {
+            return xScale(d.income) + 15/2.5;
+        })
+        .attr("dy", function(d) {
+            return yScale(d.obesity) + 20/2;
+        })
+        .attr("text-anchor", "middle");
 
         chartGroup.append("text")
             .attr("transform", "rotate(-90)")
